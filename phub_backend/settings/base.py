@@ -20,8 +20,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'account',
+    'rest_framework',
+    'accounts',
 ]
+
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -34,6 +37,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'phub_backend.urls'
+
 
 TEMPLATES = [
     {
