@@ -5,7 +5,12 @@ from .custom_manager import CustomUserManager
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(
+        unique=True, 
+        error_messages= {
+            'unique': "This email is already in use.",
+            'blank': "Please provide an email address.",
+        })
 
     #adittional info
     joining_date = models.DateTimeField(auto_now_add= True)
