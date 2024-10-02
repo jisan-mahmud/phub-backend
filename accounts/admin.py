@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser
+
 class CustomUserAdmin(UserAdmin):
     list_display = ('email', 'first_name', 'last_name', 'is_staff', 'is_active')
     list_filter = ('is_staff', 'is_superuser', 'is_active')
@@ -12,12 +13,6 @@ class CustomUserAdmin(UserAdmin):
         (('Important dates'), {'fields': ('last_login', 'joining_date', 'last_update')}),
     )
 
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('email', 'first_name', 'last_name', 'password1', 'password2'),
-        }),
-    )
     ordering = ('email',)
     readonly_fields = ('last_login', 'joining_date', 'last_update')
 
