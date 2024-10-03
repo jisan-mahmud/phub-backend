@@ -1,6 +1,6 @@
-from django.urls import path
-from .views import SingupAPIView, verify_email
+from django.urls import path, include
+
 urlpatterns = [
-    path('signup/', SingupAPIView.as_view(), name='sign_up'),
-    path('verify-email/', verify_email, name='verify-email')
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
 ]

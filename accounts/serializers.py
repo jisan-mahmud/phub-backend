@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .email_verification import EmailSender
 
 User = get_user_model()
 
@@ -32,8 +31,5 @@ class SignupSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.is_active = False
         user.save()
-
-        email = EmailSender(user, self.context.get('request'))
-        email.send_verification_email()
 
         return user
