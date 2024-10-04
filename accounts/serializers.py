@@ -23,6 +23,7 @@ class SignupSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('repeat_password')
+        username = validated_data.get('email').split('@')[0]
         user = User(
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
@@ -30,6 +31,29 @@ class SignupSerializer(serializers.ModelSerializer):
         )
         user.set_password(validated_data['password'])
         user.is_active = False
+        user.username = username
         user.save()
 
         return user
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'username', 'bio', 'profile_image', 'cover_image', 'about', 'followers', 'following', 'total_post']
+
+class CurrentUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'email', 'username', 'bio', 'profile_image', 'cover_image', 'about', 'followers', 'following', 'total_post']
+
+
+class UsernameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username']
+        extra_kwargs = {
+            'username': {
+                'required': True,
+            },
+        }

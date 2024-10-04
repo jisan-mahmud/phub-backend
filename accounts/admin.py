@@ -7,13 +7,13 @@ class CustomUserAdmin(UserAdmin):
     list_filter = ('is_staff', 'is_superuser', 'is_active')
     search_fields = ('email', 'first_name', 'last_name')
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        (('Personal info'), {'fields': ('first_name', 'last_name')}),
+        (None, {'fields': ('email', 'username', 'password')}),
+        (('Personal info'), {'fields': ('first_name', 'last_name','profile_image', 'cover_image', 'bio', 'about', 'followers', 'following', 'total_post')}),
         (('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         (('Important dates'), {'fields': ('last_login', 'joining_date', 'last_update')}),
     )
 
     ordering = ('email',)
-    readonly_fields = ('last_login', 'joining_date', 'last_update')
+    readonly_fields = ('last_login', 'joining_date', 'last_update', 'followers', 'following', 'total_post')
 
 admin.site.register(CustomUser, CustomUserAdmin)

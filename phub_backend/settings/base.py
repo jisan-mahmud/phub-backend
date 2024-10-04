@@ -1,4 +1,6 @@
 from pathlib import Path
+from datetime import timedelta
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,6 +25,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'djoser',
     'accounts',
+    'django_extensions',
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
@@ -36,9 +39,17 @@ REST_FRAMEWORK = {
     ],
 }
 
+
+#JWT Token configuration
 SIMPLE_JWT = {
-   'AUTH_HEADER_TYPES': ('JWT',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60), 
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('JWT',),
+    'UPDATE_LAST_LOGIN': True,
 }
+
 
 
 MIDDLEWARE = [
@@ -119,6 +130,7 @@ EMAIL_HOST_USER = 'jisa.mahmud20@gmail.com'
 EMAIL_HOST_PASSWORD = 'plta scii celp xoez'
 
 
+from rest_framework.permissions import AllowAny
 #djoser configuration
 DJOSER = {
     'SEND_ACTIVATION_EMAIL': True,
@@ -127,6 +139,9 @@ DJOSER = {
     'ACTIVATION_URL': 'activate/{uid}/{token}',
     'SERIALIZERS': {
         'user_create': 'accounts.serializers.SignupSerializer',
+        'user': 'accounts.serializers.UserSerializer',
+        'current_user': 'accounts.serializers.CurrentUserSerializer',
     },
     'TOKEN_MODEL': None,
+    'SET_PASSWORD_RETYPE': True,
 }
