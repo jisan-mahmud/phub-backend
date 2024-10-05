@@ -1,3 +1,6 @@
 from django.shortcuts import render
+from rest_framework import viewsets
+from .models import Snippet
 
-# Create your views here.
+class SnippetViewset(viewsets):
+    
