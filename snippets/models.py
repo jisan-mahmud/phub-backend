@@ -23,7 +23,7 @@ class Snippet(models.Model):
     description = models.TextField(blank=True)
     snippet = models.TextField()
     snippet_type = models.CharField(max_length=15, choices= LANGUAGE_CHOICES)
-    explanation = models.TextField(blank=True)
+    explanation = models.TextField(blank=True, null= True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
     upvotes = models.PositiveIntegerField(default=0)
