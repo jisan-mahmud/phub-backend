@@ -47,6 +47,12 @@ class CurrentUserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'first_name', 'last_name', 'email', 'username', 'bio', 'profile_image', 'cover_image', 'about', 'followers', 'following', 'total_post']
 
+        extra_kwargs ={
+            'email': {
+                'required': False
+            }
+        }
+
 
 class UsernameSerializer(serializers.ModelSerializer):
     class Meta:
