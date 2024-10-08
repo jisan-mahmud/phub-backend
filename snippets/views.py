@@ -9,11 +9,16 @@ from django.shortcuts import get_object_or_404
 from .models import Snippet
 from .serializers import SnippetSerializer
 from .permissions import SnippetPermission
+from .paginations import SnippetPagination
 
 class SnippetViewSet(viewsets.ModelViewSet):
     queryset = Snippet.objects.all()
     permission_classes = [SnippetPermission]
     serializer_class = SnippetSerializer
+    pagination_class = SnippetPagination
+    filterset_fields = ['language', 'title', 'created_at']
+    ordering_fields = ['title', 'language', 'created_at']
+    ordering = ['-created_at']
 
     def perform_create(self, serializer):
         # Automatically set the user to the currently authenticated user
@@ -36,23 +41,42 @@ class SnippetViewSet(viewsets.ModelViewSet):
 # ViewSet to list all snippets belonging to a specific user by their username
 class UserSnippetList(viewsets.ViewSet):
     permission_classes = [AllowAny]
+    pagination_class = SnippetPagination
+
     def list(self, request, username):
         queryset = Snippet.objects.filter(
             Q(user__username=username) &
             Q(visibility= 'public')
             )
-        serializer = SnippetSerializer(queryset, many=True, context= {'request': request})
-        return Response(serializer.data, status= status.HTTP_200_OK)
+        # Apply paginator
+        paginator = self.pagination_class() # Instantiate the paginator
+        paginated_snippet = paginator.paginate_queryset(queryset, request)
+        if paginated_snippet:
+            serializer = SnippetSerializer(paginated_snippet, many=True, context= {'request': request})
+            return paginator.get_paginated_response(serializer.data) # Use the paginator to return paginated response
+        return Response(status= status.HTTP_204_NO_CONTENT)
     
 #This APIView for get login user snippet
 class LoginUserSnippet(APIView):
     permission_classes = [IsAuthenticated]
+    pagination_class = SnippetPagination
+    filterset_fields = ['language', 'title', 'created_at']
+    ordering_fields = ['title', 'language', 'created_at']
+    ordering = ['-created_at']
+    
     def get(self, request):
-        snippet = Snippet.objects.filter(user= request.user)
-        if snippet.exists():
-            serializer = SnippetSerializer(snippet, many= True, context= {'request': request})
-            return Response(serializer.data, status= status.HTTP_200_OK)
-        return Response(status= status.HTTP_204_NO_CONTENT)
+        # Filter logged-in user snippets
+        snippet = Snippet.objects.filter(user=request.user)
+
+        # Apply paginator
+        paginator = self.pagination_class()  # Instantiate the paginator
+        paginated_snippets = paginator.paginate_queryset(queryset=snippet, request=request) 
+
+        if paginated_snippets:
+            serializer = SnippetSerializer(paginated_snippets, many=True, context={'request': request})
+            return paginator.get_paginated_response(serializer.data)  # Use the paginator to return paginated response
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
 # Define a ViewSet class to handle sharing unlisted snippets
 class ShareUnlistedSnippetView(APIView):
