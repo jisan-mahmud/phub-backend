@@ -35,7 +35,7 @@ class Snippet(models.Model):
     upvotes = models.PositiveIntegerField(default=0)
     downvotes = models.PositiveIntegerField(default=0)
     visibility = models.CharField(max_length=10, choices=VISIBILITY_CHOICES, default='public')
-    token = models.UUIDField(default=uuid.uuid4, editable=False, blank= True)
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique= True, blank= True)
 
 
     def __str__(self):
