@@ -1,7 +1,7 @@
 from django.db.models import Q
-from rest_framework import viewsets
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
-from rest_framework.decorators import action
+from rest_framework.generics import ListAPIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -11,7 +11,8 @@ from .serializers import SnippetSerializer
 from .permissions import SnippetPermission
 from .paginations import SnippetPagination
 
-class SnippetViewSet(viewsets.ModelViewSet):
+# ViewSet to handle all snippets operations
+class SnippetViewSet(ModelViewSet):
     queryset = Snippet.objects.all()
     permission_classes = [SnippetPermission]
     serializer_class = SnippetSerializer
@@ -31,57 +32,39 @@ class SnippetViewSet(viewsets.ModelViewSet):
             return Snippet.objects.filter(
                 Q(user = user) | # Snippets created by the current user
                 Q(visibility = 'public') # Publicly visible snippets
-                )
-        return Snippet.objects.filter(visibility = 'public')
+                ).select_related('user')
+        return Snippet.objects.filter(visibility = 'public').select_related('user')
 
     def get_serializer(self, *args, **kwargs):
         kwargs['context'] = {'request': self.request}
         return super().get_serializer(*args, **kwargs)
 
 # ViewSet to list all snippets belonging to a specific user by their username
-class UserSnippetList(viewsets.ViewSet):
+class UserSnippetList(ListAPIView):
     permission_classes = [AllowAny]
     pagination_class = SnippetPagination
+    serializer_class = SnippetSerializer
 
-    def list(self, request, username):
-        queryset = Snippet.objects.filter(
-            Q(user__username=username) &
+    def get_queryset(self):
+        username = self.kwargs.get('username')
+        if username:
+            return Snippet.objects.filter(
+            Q(user__username= username) &
             Q(visibility= 'public')
-            )
-        # Apply paginator
-        paginator = self.pagination_class() # Instantiate the paginator
-        paginated_snippet = paginator.paginate_queryset(queryset, request)
-        if paginated_snippet:
-            serializer = SnippetSerializer(paginated_snippet, many=True, context= {'request': request})
-            return paginator.get_paginated_response(serializer.data) # Use the paginator to return paginated response
-        return Response(status= status.HTTP_204_NO_CONTENT)
-    
+            ).select_related('user')
+        return Snippet.objects.none
+        
 #This APIView for get login user snippet
-class LoginUserSnippet(APIView):
+class LoginUserSnippet(ListAPIView):
     permission_classes = [IsAuthenticated]
     pagination_class = SnippetPagination
-    filterset_fields = ['language', 'title', 'created_at']
-    ordering_fields = ['title', 'language', 'created_at']
-    ordering = ['-created_at']
-    
-    def get(self, request):
-        # Filter logged-in user snippets
-        snippet = Snippet.objects.filter(user=request.user)
-
-        # Apply paginator
-        paginator = self.pagination_class()  # Instantiate the paginator
-        paginated_snippets = paginator.paginate_queryset(queryset=snippet, request=request) 
-
-        if paginated_snippets:
-            serializer = SnippetSerializer(paginated_snippets, many=True, context={'request': request})
-            return paginator.get_paginated_response(serializer.data)  # Use the paginator to return paginated response
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    serializer_class = SnippetSerializer
+    def get_queryset(self):
+        return Snippet.objects.filter(user= self.request.user).select_related('user')
     
 # Define a ViewSet class to handle sharing unlisted snippets
 class ShareUnlistedSnippetView(APIView):
     permission_classes = [AllowAny]
-
     def get(self, request, token):
         try:
             # Get the snippet object that matches the provided token

@@ -1,12 +1,21 @@
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 from .models import Snippet
+User = get_user_model()
+
+# User serializer
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name', 'profile_image']
 
 class SnippetSerializer(serializers.ModelSerializer):
+    # Nesting user serializer with snippet serializer
+    user = UserSerializer(read_only= True)
     class Meta:
         model = Snippet
         fields = ['id', 'user', 'title', 'description', 'snippet', 'language', 'created_at', 'last_update', 'upvotes', 'downvotes', 'visibility', 'token']
-        read_only_fields = ['user']
 
     # overrite default serializer representation
     def to_representation(self, instance):

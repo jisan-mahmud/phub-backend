@@ -30,13 +30,12 @@ class Snippet(models.Model):
     snippet = models.TextField()
     language = models.CharField(max_length=15, choices=LANGUAGE_CHOICES)
     explanation = models.TextField(blank=True, null=True)
+    visibility = models.CharField(max_length=10, choices=VISIBILITY_CHOICES, default='public')
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique= True, blank= True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
     upvotes = models.PositiveIntegerField(default=0)
     downvotes = models.PositiveIntegerField(default=0)
-    visibility = models.CharField(max_length=10, choices=VISIBILITY_CHOICES, default='public')
-    token = models.UUIDField(default=uuid.uuid4, editable=False, unique= True, blank= True)
-
 
     def __str__(self):
         return f'{self.title} by {self.user}'
