@@ -16,4 +16,16 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('email',)
     readonly_fields = ('last_login', 'joining_date', 'last_update', 'followers', 'following', 'total_post')
 
+    add_fieldsets = (
+        (None, {
+            'fields': ('email', 'username', 'password'),
+        }),
+        ('Personal Info', {
+            'fields': ('first_name', 'last_name'),
+        }),
+        ('Permissions', {
+            'fields': ('is_active', 'is_staff', 'is_superuser'),
+        }),
+    )
+
 admin.site.register(CustomUser, CustomUserAdmin)

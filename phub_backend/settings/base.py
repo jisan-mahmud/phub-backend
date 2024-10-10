@@ -12,6 +12,27 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-86y+hv!p63a5azz(#2_05*ax@n!x=5z2=gid6w2d-$7kshi+))'
 
+# Application definition
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'djoser',
+    'django_filters',
+    'accounts',
+    'snippets',
+    'comments',
+    'vote',
+
+    #for debuging
+    'django_extensions',
+    "debug_toolbar",
+]
+
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 REST_FRAMEWORK = {
@@ -27,7 +48,6 @@ REST_FRAMEWORK = {
     ],
 }
 
-
 #JWT Token configuration
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60), 
@@ -37,6 +57,17 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT',),
     'UPDATE_LAST_LOGIN': True,
 }
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
 
 
 ROOT_URLCONF = 'phub_backend.urls'
