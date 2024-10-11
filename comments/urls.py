@@ -1,10 +1,12 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import CommentViewset
+from .views import CommentViewset, CommentRepliesViewset
 
 router = DefaultRouter()
-router.register(r'', CommentViewset, basename='snippet-comments')
+router.register(r'', CommentViewset, basename='comments')
+# router.register(r'<int:parent_comment>replies/', CommentRepliesViewset, basename='comment-replies')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('<int:parent_comment_id>/replies/', CommentRepliesViewset.as_view({'get': 'list', 'post': 'create'}), name='comment-replies'),  # Use separate path for replies
 ]

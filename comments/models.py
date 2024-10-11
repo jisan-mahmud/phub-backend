@@ -7,7 +7,7 @@ User = get_user_model()
 
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
-    snippet = models.ForeignKey(Snippet, on_delete=models.CASCADE, related_name='comments', blank=True, null=True)
+    snippet = models.ForeignKey(Snippet, on_delete=models.CASCADE, related_name='comments')
     parent_comment = models.ForeignKey('self', on_delete=models.CASCADE, related_name='replies', blank=True, null=True)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -16,14 +16,12 @@ class Comment(models.Model):
     downvotes = models.PositiveIntegerField(default=0)
 
     def clean(self):
-        # Ensure that either parent_comment or snippet is provided, but not both
-        if not self.parent_comment and not self.snippet:
-            raise ValidationError('You must provide either a parent comment or a snippet.')
-        if self.parent_comment and self.snippet:
-            raise ValidationError('You cannot provide both a parent comment and a snippet.')
-        # Ensure that a comment cannot be its own parent
         if self.parent_comment == self:
             raise ValidationError('A comment cannot reply to itself.')
+        
+        # Ensure the snippet of the comment matches the snippet of its parent comment
+        if self.parent_comment and self.snippet != self.parent_comment.snippet:
+            raise ValidationError('The comment\'s snippet must match the parent comment\'s snippet.')
 
     def __str__(self) -> str:
         return f'{self.id} comment by {self.user}'
