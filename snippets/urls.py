@@ -14,6 +14,11 @@ urlpatterns = [
     path('me/', LoginUserSnippet.as_view(), name='login-user-snippet'),
     path('user/<str:username>/', UserSnippetList.as_view(), name='users-snippet'),
     path('share/<token>/', ShareUnlistedSnippetView.as_view(), name='share-unlisted-snappet'),
+
+   # Nested comment routes: include comment-related URLs under /snippets/<snippet_id>/comments/
+    path('<int:snippet_id>/comments/', include('comments.urls')),
+
+    # Snippet CRUD routes from router
     path('', include(router.urls)),
     
 ]

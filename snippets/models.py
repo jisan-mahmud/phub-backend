@@ -38,5 +38,5 @@ class Snippet(models.Model):
     downvotes = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f'{self.title} by {self.user}'
+        return f'id: {self.id}, title: {self.title}, create_by: {self.user}'
 

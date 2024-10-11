@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from django.urls import reverse
 
 User = get_user_model()
 
@@ -36,8 +37,8 @@ class SignupSerializer(serializers.ModelSerializer):
 
         return user
 
-
-class UserSerializer(serializers.ModelSerializer):
+#user information in long formate
+class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name', 'username', 'bio', 'profile_image', 'cover_image', 'about', 'followers', 'following', 'total_post']
@@ -63,3 +64,15 @@ class UsernameSerializer(serializers.ModelSerializer):
                 'required': True,
             },
         }
+
+# User information in short form
+class UserSerializer(serializers.ModelSerializer):
+    profile_url = serializers.SerializerMethodField() 
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name', 'profile_image', 'profile_url']
+        
+    def get_profile_url(self, obj):
+        # Construct and return the profile URL based on the user's ID
+        relative_url = reverse('user', kwargs={'username': obj.username})
+        return self.context['request'].build_absolute_uri(relative_url)
