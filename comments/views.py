@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework import status
-from django.db.models import Q
+from django.db.models import Q, Count
 from .serializers import CommentSerializer
 from .permission import CommentPermission
 from .models import Comment
@@ -32,9 +32,10 @@ class CommentViewset(ModelViewSet):
         return comments
     
     def get_serializer_context(self):
-        # Add the request to the context
+        # Add the request and snippet_id to the context
         context = super().get_serializer_context()
-        context['request'] = self.request 
+        context['request'] = self.request
+        context['snippet_id'] = self.kwargs.get('snippet_id')
         return context
     
 class CommentRepliesViewset(ModelViewSet):
@@ -66,4 +67,5 @@ class CommentRepliesViewset(ModelViewSet):
         # Add the request to the context
         context = super().get_serializer_context()
         context['request'] = self.request 
+        context['snippet_id'] = self.kwargs.get('snippet_id')
         return context

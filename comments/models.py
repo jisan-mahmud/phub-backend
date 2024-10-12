@@ -15,6 +15,12 @@ class Comment(models.Model):
     upvotes = models.PositiveIntegerField(default=0)
     downvotes = models.PositiveIntegerField(default=0)
 
+    reply_count = models.PositiveIntegerField(default= 0)
+
+    @property
+    def total_replies(self):
+        return self.reply_count
+    
     def clean(self):
         if self.parent_comment == self:
             raise ValidationError('A comment cannot reply to itself.')
