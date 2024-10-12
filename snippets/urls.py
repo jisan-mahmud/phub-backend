@@ -16,7 +16,7 @@ urlpatterns = [
     path('share/<token>/', ShareUnlistedSnippetView.as_view(), name='share-unlisted-snappet'),
 
    # Nested comment routes: include comment-related URLs under /snippets/<snippet_id>/comments/
-    path('<int:snippet_id>/comments/', include('comments.urls')),
+    path('<int:snippet_id>/comments/', include('comments.urls'), name= "single-comment"),
 
     # Snippet CRUD routes from router
     path('', include(router.urls)),
