@@ -18,7 +18,7 @@ urlpatterns = [
     # Nested comment routes: include comment-related URLs under /snippets/<snippet_id>/comments/
     path('<int:snippet_id>/comments/', include('comments.urls')),
     # Nested vote routes: include vote-related URLs under /snippets/<snippet_id>/vote/
-    path('<int:snippet_id>/vote', include('votes.urls')),
+    path('<int:snippet_id>/vote/', include('votes.urls')),
 
     # Snippet CRUD routes from router
     path('', include(router.urls)),
