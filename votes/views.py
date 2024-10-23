@@ -2,12 +2,16 @@ from rest_framework.generics import CreateAPIView, RetrieveAPIView, DestroyAPIVi
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import AllowAny
+from django.db.models import signals
 from .serializers import VoteSerializers
 from .models import Vote
+from django.db import connection
 
 class VoteViewset(CreateAPIView, RetrieveAPIView, DestroyAPIView):
     queryset = Vote.objects.all()
     serializer_class = VoteSerializers
+    permission_classes = [AllowAny]
     lookup_field = 'id'
 
     def create(self, request, *args, **kwargs):
@@ -53,11 +57,15 @@ class VoteViewset(CreateAPIView, RetrieveAPIView, DestroyAPIView):
 
         # Handle vote for snippet
         if snippet_id and not comment_id:
+            # Log the number of queries
+            query_count = len(connection.queries)
+            print(f"Number of queries: {query_count}", connection.queries)
             return handle_vote('snippet_vote', snippet_id)
 
         # Handle vote for comment
         if comment_id:
             return handle_vote('comment_vote', comment_id)
+        
 
         return Response({"error": "Invalid vote data."}, status=status.HTTP_400_BAD_REQUEST)
             
@@ -84,6 +92,9 @@ class VoteViewset(CreateAPIView, RetrieveAPIView, DestroyAPIView):
                 return Response(status= status.HTTP_204_NO_CONTENT)
             
         seriaizer = self.get_serializer(vote)
+        # Log the number of queries
+        query_count = len(connection.queries)
+        print(f"Number of queries: {query_count}", connection.queries)
         return Response(seriaizer.data, status= status.HTTP_200_OK)
     
 

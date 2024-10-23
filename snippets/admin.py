@@ -6,6 +6,6 @@ class SnippetAdmin(admin.ModelAdmin):
     ordering = ['created_at', 'upvotes', 'downvotes']
     search_fields = ['user', 'title']
 
-    readonly_fields = ['upvotes', 'downvotes']
+    # readonly_fields = ['upvotes', 'downvotes']
 
 admin.site.register(Snippet, SnippetAdmin)
