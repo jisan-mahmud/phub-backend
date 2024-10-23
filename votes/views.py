@@ -2,7 +2,8 @@ from rest_framework.generics import CreateAPIView, RetrieveAPIView, DestroyAPIVi
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsOwner
 from django.db.models import signals
 from .serializers import VoteSerializers
 from .models import Vote
@@ -11,7 +12,7 @@ from django.db import connection
 class VoteViewset(CreateAPIView, RetrieveAPIView, DestroyAPIView):
     queryset = Vote.objects.all()
     serializer_class = VoteSerializers
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsOwner]
     lookup_field = 'id'
 
     def create(self, request, *args, **kwargs):
