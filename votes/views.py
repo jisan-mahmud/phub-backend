@@ -93,9 +93,6 @@ class VoteViewset(CreateAPIView, RetrieveAPIView, DestroyAPIView):
                 return Response(status= status.HTTP_204_NO_CONTENT)
             
         seriaizer = self.get_serializer(vote)
-        # Log the number of queries
-        query_count = len(connection.queries)
-        print(f"Number of queries: {query_count}", connection.queries)
         return Response(seriaizer.data, status= status.HTTP_200_OK)
     
 

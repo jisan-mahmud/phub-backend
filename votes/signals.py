@@ -29,8 +29,13 @@ def check_previous_vote(sender, instance, **kwargs):
                 instance.comment.upvotes -= 1
                 instance.comment.downvotes += 1
 
-        # Save the updated snippet
-        instance.snippet.save()
+        #save changes
+        if instance.comment:
+            # Save the updated comment
+            instance.comment.save()
+        else:
+            # Save the updated snippet
+            instance.snippet.save()
     
     # If creating a new vote
     else:  
@@ -52,10 +57,35 @@ def check_previous_vote(sender, instance, **kwargs):
             elif instance.comment:
                 instance.comment.downvotes += 1
         
-        # Save the updated snippet
-        instance.snippet.save()  
+        # Save the updated vote counts for the related snippet or comment
+        if instance.comment:
+            instance.comment.save()
+        else:
+            instance.snippet.save()
 
 # Triggered after a Vote is deleted
 @receiver(post_delete, sender=Vote)
 def handle_vote_delete(sender, instance, **kwargs):
-    print(f"Vote deleted: {instance.vote_type}")
+    # Check if the deleted vote was an upvote
+    if instance.vote_type == 'upvote':
+        # If the vote is associated with a snippet, decrement its upvote count
+        if instance.snippet:
+            instance.snippet.upvotes -= 1
+        # If the vote is associated with a comment, decrement its upvote count
+        elif instance.comment:
+            instance.comment.upvotes -= 1
+        
+    # Check if the deleted vote was a downvote
+    elif instance.vote_type == 'downvote':
+        # If the vote is associated with a snippet, decrement its downvote count
+        if instance.snippet:
+            instance.snippet.downvotes -= 1
+        # If the vote is associated with a comment, decrement its downvote count
+        elif instance.comment:
+            instance.comment.downvotes -= 1
+    
+    # Save the updated vote counts for the related snippet or comment
+    if instance.snippet:
+        instance.snippet.save(update_fields=['upvotes', 'downvotes'])
+    elif instance.comment:
+        instance.comment.save(update_fields=['upvotes', 'downvotes'])

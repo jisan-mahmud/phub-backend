@@ -36,6 +36,12 @@ class Snippet(models.Model):
     last_update = models.DateTimeField(auto_now=True)
     upvotes = models.PositiveIntegerField(default=0)
     downvotes = models.PositiveIntegerField(default=0)
+    comment_count = models.PositiveIntegerField(default= 0)
+
+    @property
+    def total_comment(self):
+        return self.total_comment
+    
 
     def __str__(self):
         return f'id: {self.id}, title: {self.title}, create_by: {self.user}'
