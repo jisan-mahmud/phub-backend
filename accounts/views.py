@@ -13,13 +13,13 @@ class UserAPIView(APIView):
             try:
                 # Fetch the user from the database
                 user = User.objects.get(username=username)
-                serializer = UserSerializer(user)
+                serializer = UserSerializer(user, context={'request': request})
             except User.DoesNotExist:
                 return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
             
         else:
             user = User.objects.all()
-            serializer = UserSerializer(user, many= True)
+            serializer = UserSerializer(user, many= True, context={'request': request})
         return Response(serializer.data)
     
 class UpdateUsernameAPIView(APIView):
