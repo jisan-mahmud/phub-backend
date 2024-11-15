@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'snippets',
     'comments',
     'votes',
+    'users',
 
     #for debuging
     'django_extensions',
