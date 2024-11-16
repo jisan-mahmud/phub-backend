@@ -14,6 +14,7 @@ class Follow(models.Model):
     
     class Meta:
         unique_together= ['followed', 'follower']
+        
         constraints = [
             models.CheckConstraint(
                 check= ~Q(followed = models.F('follower')),

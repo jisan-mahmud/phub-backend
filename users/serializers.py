@@ -1,17 +1,23 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 from .models import Follow
 
-class FollowSeralizer(ModelSerializer):
+class FollowSeralizer(serializers.ModelSerializer):
 
     class Meta:
         model = Follow
         fields = ['followed', 'follower']
 
-        extra_kwargs = {
-            'followed': {
-                'read_only': True
-            },
-            'follower': {
-                'read_only': True
-            }
-        }
+    def validate(self, attrs):
+        follower = attrs.get('follower')
+        followed = attrs.get('followed')
+
+        print(followed, follower)
+        # Check if a user is trying to follow themselves
+        if follower == followed:
+            raise serializers.ValidationError('You cannot follow yourself.')
+        has = Follow.objects.filter(followed= followed, follower= follower).exists();
+
+        if has:
+            raise serializers.ValidationError('You are already following this user.')
+        
+        return attrs
