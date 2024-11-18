@@ -42,12 +42,16 @@ class FollowCreateView(APIView):
 
     def get(self, request, username= None):
         try:
+            # Attempt to fetch the user object corresponding to the provided username
             followed_user = User.objects.get(username= username)
         except User.DoesNotExist:
+            # If the user does not exist, return a 404 response with an error message
             return Response(
                 {'error': f'User with username {username} does not exist.'}, 
                 status= status.HTTP_404_NOT_FOUND
                 )
+        # Check if the authenticated user (follower) is already following the user (followed_user)
         already_followed = Follow.objects.filter(followed = followed_user, follower= request.user).exists()
 
+        # Return a response indicating whether the user is already followed
         return Response({'already_followed': already_followed})
