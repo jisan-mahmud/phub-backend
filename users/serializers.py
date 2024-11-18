@@ -1,23 +1,25 @@
 from rest_framework import serializers
 from .models import Follow
 
-class FollowSeralizer(serializers.ModelSerializer):
+class FollowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Follow
         fields = ['followed', 'follower']
+        unique_together = ['followed', 'follower']
 
+    def get_unique_together_validators(self):
+        submited_data = self.initial_data
+        if Follow.objects.filter(followed= submited_data.get('followed'), follower= submited_data.get('follower')).exists():
+            raise serializers.ValidationError('Duplicate follow relationship detected.')
+        return []
+    
+    
     def validate(self, attrs):
-        follower = attrs.get('follower')
         followed = attrs.get('followed')
+        follower = attrs.get('follower')
 
-        print(followed, follower)
-        # Check if a user is trying to follow themselves
         if follower == followed:
             raise serializers.ValidationError('You cannot follow yourself.')
-        has = Follow.objects.filter(followed= followed, follower= follower).exists();
-
-        if has:
-            raise serializers.ValidationError('You are already following this user.')
         
         return attrs

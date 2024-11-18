@@ -13,8 +13,8 @@ class Follow(models.Model):
         return f'{self.follower} following {self.followed}'
     
     class Meta:
-        unique_together= ['followed', 'follower']
-        
+        unique_together = ['followed', 'follower']
+
         constraints = [
             models.CheckConstraint(
                 check= ~Q(followed = models.F('follower')),
