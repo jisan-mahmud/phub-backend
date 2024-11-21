@@ -52,8 +52,9 @@ class CurrentUserSerializer(serializers.ModelSerializer):
         }
 
     def get_snippets(self, obj):
+        print()
         snippet_url = reverse('users-snippet', kwargs={'username': obj.username})
-        return snippet_url
+        return self.context['request'].build_absolute_uri(snippet_url)
 
 
 class UsernameSerializer(serializers.ModelSerializer):
