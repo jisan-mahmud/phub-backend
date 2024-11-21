@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.urls import reverse
 from .models import Comment
-from accounts.serializers import UserSerializer
+from users.serializers import UserSerializer
 
 class CommentSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)

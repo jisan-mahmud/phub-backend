@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from .models import Snippet
-from accounts.serializers import UserSerializer
+from users.serializers import UserSerializer
 User = get_user_model()
 
 
