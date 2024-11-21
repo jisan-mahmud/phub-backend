@@ -11,7 +11,7 @@ router = DefaultRouter()
 router.register(r'', SnippetViewSet, basename= 'snippet')
 
 urlpatterns = [
-    path('me/', LoginUserSnippet.as_view(), name='login-user-snippet'),
+    path('my/', LoginUserSnippet.as_view(), name='login-user-snippet'),
     path('user/<str:username>/', UserSnippetList.as_view(), name='users-snippet'),
     path('share/<token>/', ShareUnlistedSnippetView.as_view(), name='share-unlisted-snappet'),
 

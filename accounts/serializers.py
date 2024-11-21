@@ -39,15 +39,21 @@ class SignupSerializer(serializers.ModelSerializer):
 
 
 class CurrentUserSerializer(serializers.ModelSerializer):
+    snippets = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'email', 'username', 'bio', 'profile_image', 'cover_image', 'about', 'followers', 'following', 'total_post']
+        fields = ['id', 'first_name', 'last_name', 'email', 'username', 'bio', 'profile_image', 'cover_image', 'about', 'followers', 'following', 'total_post', 'snippets']
 
         extra_kwargs ={
             'email': {
                 'read_only': True
             }
         }
+
+    def get_snippets(self, obj):
+        snippet_url = reverse('users-snippet', kwargs={'username': obj.username})
+        return snippet_url
 
 
 class UsernameSerializer(serializers.ModelSerializer):
