@@ -5,9 +5,10 @@ User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     profile_url = serializers.SerializerMethodField() 
+    is_following = serializers.BooleanField()
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'profile_image', 'profile_url']
+        fields = ['id', 'username', 'first_name', 'last_name', 'profile_image', 'profile_url', 'is_following']
         
     def get_profile_url(self, obj):
         # Construct and return the profile URL based on the user's ID
@@ -16,10 +17,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserInformationSerializer(serializers.ModelSerializer):
     snippets = serializers.SerializerMethodField()
+    is_following = serializers.BooleanField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'about', 'bio', 'profile_image', 'cover_image','followers', 'following', 'total_post', 'snippets']
+        fields = ['id', 'username', 'first_name', 'last_name', 'about', 'bio', 'profile_image', 'cover_image','followers', 'following', 'total_post', 'snippets', 'is_following']
     
     def get_snippets(self, obj):
         snippet_url = reverse('users-snippet', kwargs= {'username': obj.username})
