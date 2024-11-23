@@ -5,7 +5,7 @@ from django.db.models import Q
 User = get_user_model()
 
 class Follow(models.Model):
-    followed = models.ForeignKey(User, models.CASCADE)
+    followed = models.ForeignKey(User, on_delete=models.CASCADE)
     follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followings')
     following_date = models.DateTimeField(auto_now= True)
 

@@ -7,10 +7,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny
+from rest_framework.decorators import action
 
 User = get_user_model()
 
-class FollowCreateView(APIView):
+class FollowView(APIView):
 
     permission_classes = [IsAuthenticated]
 
@@ -55,3 +56,18 @@ class FollowCreateView(APIView):
 
         # Return a response indicating whether the user is already followed
         return Response({'already_followed': already_followed})
+        
+
+class UnfollowView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, username= None, *args, **kwargs):
+        follow_object = Follow.objects.filter(followed__username= username, follower= request.user).first()
+        if follow_object:
+            follow_object.delete()
+            return Response({
+                    'message': 'Successfully unfollowed the user.',
+                    'success': True
+                }, status= status.HTTP_204_NO_CONTENT)
+        return Response({'error': 'You are not following this user.'}, status=status.HTTP_400_BAD_REQUEST)
