@@ -9,9 +9,10 @@ User = get_user_model()
 class SnippetSerializer(serializers.ModelSerializer):
     # Nesting user serializer with snippet serializer
     user = UserSerializer(read_only= True)
+    is_voted = serializers.BooleanField(read_only= True, default= False)
     class Meta:
         model = Snippet
-        fields = ['id', 'user', 'title', 'description', 'snippet', 'language', 'created_at', 'last_update', 'upvotes', 'downvotes', 'visibility', 'token']
+        fields = ['id', 'user', 'title', 'description', 'snippet', 'language', 'created_at', 'last_update', 'upvotes', 'downvotes', 'visibility', 'token', 'is_voted']
 
     # overrite default serializer representation
     def to_representation(self, instance):

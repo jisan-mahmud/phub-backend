@@ -5,7 +5,7 @@ User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     profile_url = serializers.SerializerMethodField() 
-    is_following = serializers.BooleanField()
+    is_following = serializers.BooleanField(read_only= True)
     class Meta:
         model = User
         fields = ['id', 'username', 'first_name', 'last_name', 'profile_image', 'profile_url', 'is_following']

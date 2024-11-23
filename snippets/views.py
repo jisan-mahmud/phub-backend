@@ -6,10 +6,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
+from django.db.models import Exists, OuterRef
 from .models import Snippet
 from .serializers import SnippetSerializer
 from .permissions import SnippetPermission
 from .paginations import SnippetPagination
+from votes.models import Vote
 
 # ViewSet to handle all snippets operations
 class SnippetViewSet(ModelViewSet):
@@ -29,10 +31,18 @@ class SnippetViewSet(ModelViewSet):
         user = self.request.user  # Get the current user making the request
         if user.is_authenticated:
             # If authenticated, return snippets that either belong to the user or are public
-            return Snippet.objects.filter(
+            return Snippet.objects.annotate(
+                is_voted = Exists(
+                    Vote.objects.filter(
+                        user= user,
+                        snippet= OuterRef('pk'),
+                        comment__isnull= True
+                    )
+                )
+            ).filter(
                 Q(user = user) | # Snippets created by the current user
                 Q(visibility = 'public') # Publicly visible snippets
-                ).select_related('user')
+            ).select_related('user')
         return Snippet.objects.filter(visibility = 'public').select_related('user')
 
     def get_serializer(self, *args, **kwargs):
