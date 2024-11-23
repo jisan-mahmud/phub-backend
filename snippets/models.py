@@ -1,7 +1,31 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.db.models import Exists, OuterRef, Case, When, Value, CharField, Subquery
 import uuid
 User = get_user_model()
+
+
+class SnippetManager(models.Manager):
+    def get_user_voted_snippets(self, user):
+        from votes.models import Vote
+        """Returns all snippets along with whether the user has voted on them."""
+        
+         # Define the base query for checking user votes
+        vote_filter = Vote.objects.filter(
+            user=user,
+            snippet=OuterRef('pk'),
+            comment__isnull=True
+        )
+        
+        return self.annotate(
+            is_voted=Exists(vote_filter),
+            vote_type=Case(
+                When(is_voted=True, then= Subquery(vote_filter.values('vote_type')[:1])  # Grab only the first matching vote_type
+                ),
+                default=Value('no_vote'),
+                output_field=CharField()
+            )
+        )
 
 class Snippet(models.Model):
     LANGUAGE_CHOICES = [
@@ -37,6 +61,8 @@ class Snippet(models.Model):
     upvotes = models.PositiveIntegerField(default=0)
     downvotes = models.PositiveIntegerField(default=0)
     comment_count = models.PositiveIntegerField(default= 0)
+
+    objects = SnippetManager()
 
     @property
     def total_comment(self):
