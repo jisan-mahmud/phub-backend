@@ -7,7 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny
-from rest_framework.decorators import action
+from rest_framework.generics import ListAPIView
+from users.serializers import UserSerializer
 
 User = get_user_model()
 
@@ -71,3 +72,20 @@ class UnfollowView(APIView):
                     'success': True
                 }, status= status.HTTP_204_NO_CONTENT)
         return Response({'error': 'You are not following this user.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FollowerList(ListAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = UserSerializer
+    
+    def get_queryset(self):
+        username = self.kwargs.get('username')
+
+        # Query the `User` model to retrieve all users who are followers of the given username.
+        # The `followings` related name on the `Follow` model is used to filter records where:
+        # - The `followed` field's `username` matches the provided `username`.
+        # - This implicitly joins the `User` model with the `Follow` table.
+        followers = User.objects.filter(
+            followings__followed__username=username
+        ).distinct()
+        return followers

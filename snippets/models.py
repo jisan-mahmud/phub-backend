@@ -13,7 +13,7 @@ class SnippetManager(models.Manager):
          # Define the base query for checking user votes
         vote_filter = Vote.objects.filter(
             user=user,
-            snippet=OuterRef('pk'),
+            snippet= OuterRef('pk'),
             comment__isnull=True
         )
         

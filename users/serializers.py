@@ -16,13 +16,20 @@ class UserSerializer(serializers.ModelSerializer):
         return self.context['request'].build_absolute_uri(relative_url)
 
 class UserInformationSerializer(serializers.ModelSerializer):
-    snippets = serializers.SerializerMethodField()
     is_following = serializers.BooleanField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'about', 'bio', 'profile_image', 'cover_image','followers', 'following', 'total_post', 'snippets', 'is_following']
+        fields = ['id', 'username', 'first_name', 'last_name', 'about', 'bio', 'profile_image', 'cover_image','followers', 'following', 'total_post', 'is_following']
     
-    def get_snippets(self, obj):
-        snippet_url = reverse('users-snippet', kwargs= {'username': obj.username})
-        return self.context['request'].build_absolute_uri(snippet_url)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        snippet_url = reverse('users-snippet', kwargs= {'username': instance.username})
+    
+        data['link'] = {
+            'snippet': self.context['request'].build_absolute_uri(snippet_url)
+        }
+
+        return data
+        
