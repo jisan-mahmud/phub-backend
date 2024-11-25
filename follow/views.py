@@ -81,11 +81,21 @@ class FollowerList(ListAPIView):
     def get_queryset(self):
         username = self.kwargs.get('username')
 
-        # Query the `User` model to retrieve all users who are followers of the given username.
-        # The `followings` related name on the `Follow` model is used to filter records where:
-        # - The `followed` field's `username` matches the provided `username`.
-        # - This implicitly joins the `User` model with the `Follow` table.
-        followers = User.objects.filter(
-            followings__followed__username=username
+        # Get all users who are following the specified user
+        follower_list = User.objects.filter(
+            followingList__followed__username=username
         ).distinct()
-        return followers
+        return follower_list
+    
+class FollowingList(ListAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = UserSerializer
+    
+    def get_queryset(self):
+        username = self.kwargs.get('username')
+
+        # Get all users that the specified user is following
+        followingList = User.objects.filter(
+            followerList__follower__username=username
+        ).distinct()
+        return followingList
