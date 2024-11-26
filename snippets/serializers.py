@@ -21,12 +21,12 @@ class SnippetSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
 
         #add important link
-        data['link'] = {
-            'self': self.context['request'].build_absolute_uri(f'{instance.id}/'),
-            'update': self.context['request'].build_absolute_uri(f'{instance.id}/'),
-            'delete': self.context['request'].build_absolute_uri(f'{instance.id}/'),
-            'comments': self.context['request'].build_absolute_uri(reverse('comments-list', args=[instance.id])) + '?root-comment=true'
-        }
+        # data['link'] = {
+        #     'self': self.context['request'].build_absolute_uri(f'{instance.id}/'),
+        #     'update': self.context['request'].build_absolute_uri(f'{instance.id}/'),
+        #     'delete': self.context['request'].build_absolute_uri(f'{instance.id}/'),
+        #     'comments': self.context['request'].build_absolute_uri(reverse('comments-list', args=[instance.id])) + '?root-comment=true'
+        # }
 
         #If request not equal to snippet onwer remove secret token
         if self.context['request'].user != instance.user:
