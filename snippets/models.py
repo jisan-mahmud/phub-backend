@@ -64,9 +64,10 @@ class Snippet(models.Model):
 
     objects = SnippetManager()
 
+
     @property
     def total_comment(self):
-        return self.total_comment
+        return self.comment_count
     
 
     def __str__(self):

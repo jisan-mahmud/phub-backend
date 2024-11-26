@@ -14,10 +14,10 @@ class CommentSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         context = self.context
         snippet_id = context.get('snippet_id')
-        data['links'] = {
-            'self': context['request'].build_absolute_uri(reverse('comments-detail', args=[snippet_id, instance.id])),  # Link to view the comment detail
-            'update': context['request'].build_absolute_uri(reverse('comments-detail', args=[snippet_id, instance.id])),  # Link to update the comment
-            'delete': context['request'].build_absolute_uri(reverse('comments-detail', args=[snippet_id, instance.id])),  # Link to delete the comment
-            'reply': context['request'].build_absolute_uri(reverse('comment-replies', args=[snippet_id, instance.id]))# Link to reply to the comment
-        }
+        # data['links'] = {
+        #     'self': context['request'].build_absolute_uri(reverse('comments-detail', args=[snippet_id, instance.id])),  # Link to view the comment detail
+        #     'update': context['request'].build_absolute_uri(reverse('comments-detail', args=[snippet_id, instance.id])),  # Link to update the comment
+        #     'delete': context['request'].build_absolute_uri(reverse('comments-detail', args=[snippet_id, instance.id])),  # Link to delete the comment
+        #     'reply': context['request'].build_absolute_uri(reverse('comment-replies', args=[snippet_id, instance.id]))# Link to reply to the comment
+        # }
         return data

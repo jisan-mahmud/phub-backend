@@ -71,7 +71,6 @@ class VoteViewset(CreateAPIView, RetrieveAPIView, DestroyAPIView):
         return Response({"error": "Invalid vote data."}, status=status.HTTP_400_BAD_REQUEST)
             
             
-
     def retrieve(self, request, *args, **kwargs):
         snippet_id = self.kwargs.get('snippet_id')
         comment_id = self.kwargs.get('comment_id')
