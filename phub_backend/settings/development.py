@@ -19,6 +19,9 @@ DATABASES = {
 STATIC_URL = 'static/'
 STATIC_ROOR = BASE_DIR/ 'static'
 
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR/ 'media'
+
 INTERNAL_IPS = [
     "127.0.0.1",
 ]

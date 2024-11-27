@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     #for debuging
     'django_extensions',
     "debug_toolbar",
+    'corsheaders',
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
@@ -63,6 +64,7 @@ SIMPLE_JWT = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -154,3 +156,7 @@ DJOSER = {
     'TOKEN_MODEL': None,
     'SET_PASSWORD_RETYPE': True,
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Your frontend URL
+]

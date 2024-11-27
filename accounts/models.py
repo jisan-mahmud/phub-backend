@@ -19,8 +19,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         error_messages= {
             'unique': "This username is already in use.",
         })
-    profile_image = models.ImageField(blank= True)
-    cover_image = models.ImageField(blank= True)
+    profile_image = models.ImageField(upload_to= 'profile/', default= 'profile/profile_avatar.jpg')
+    cover_image = models.ImageField(upload_to= 'cover/', blank= True)
     bio = models.CharField(max_length= 120, blank= True)
     about = models.TextField(blank= True)
     followers = models.IntegerField(default= 0, blank= True)
