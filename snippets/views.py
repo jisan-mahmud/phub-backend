@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.db.models import Q
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
@@ -10,7 +11,7 @@ from .models import Snippet
 from .serializers import SnippetSerializer
 from .permissions import SnippetPermission
 from .paginations import SnippetPagination
-# from votes.models import Vote
+from votes.models import Vote
 
 # ViewSet to handle all snippets operations
 class SnippetViewSet(ModelViewSet):
@@ -21,6 +22,28 @@ class SnippetViewSet(ModelViewSet):
     filterset_fields = ['language', 'title', 'created_at']
     ordering_fields = ['title', 'language', 'created_at']
     ordering = ['-created_at']
+
+    def list(self, request, *args, **kwargs):
+        cache_key = 'snippets_list'
+        cache_data = cache.get(cache_key)
+        if cache_data:
+            print('Serve from caches')
+            return Response(cache_data, status= status.HTTP_200_OK)
+        response = super().list(request, *args, **kwargs)
+        cache.set(cache_key, response.data, timeout= 1000)
+        print('data server from db')
+        return response
+    
+    def retrieve(self, request, *args, **kwargs):
+        cache_key = f'snippet_key_{kwargs.get('pk')}'
+        cache_data = cache.get(cache_key)
+        if cache_data:
+            print('Serve from caches')
+            return Response(cache_data, status= status.HTTP_200_OK)
+        response = super().retrieve(request, *args, **kwargs)
+        cache.set(cache_key, response.data, timeout= 1000)
+        print('data server from db')
+        return response
 
     def perform_create(self, serializer):
         # Automatically set the user to the currently authenticated user
