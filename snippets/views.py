@@ -1,4 +1,5 @@
 from django.core.cache import cache
+# from rest_framework.decorators
 from django.db.models import Q
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
@@ -23,8 +24,12 @@ class SnippetViewSet(ModelViewSet):
     ordering_fields = ['title', 'language', 'created_at']
     ordering = ['-created_at']
 
+    # def list(self, request, *args, **kwargs):
+    #     return super().list(request, *args, **kwargs)
+
     def list(self, request, *args, **kwargs):
-        cache_key = 'snippets_list'
+        page = request.GET.get('snippet_page')
+        cache_key = f'snippets_list_page:{page}'
         cache_data = cache.get(cache_key)
         if cache_data:
             print('Serve from caches')
@@ -35,7 +40,7 @@ class SnippetViewSet(ModelViewSet):
         return response
     
     def retrieve(self, request, *args, **kwargs):
-        cache_key = f'snippet_key_{kwargs.get('pk')}'
+        cache_key = f'snippet_id:{kwargs.get('pk')}'
         cache_data = cache.get(cache_key)
         if cache_data:
             print('Serve from caches')
@@ -69,6 +74,11 @@ class UserSnippetList(ListAPIView):
     permission_classes = [AllowAny]
     pagination_class = SnippetPagination
     serializer_class = SnippetSerializer
+    
+    def get_paginated_response(self, data):
+        print(data)
+        return super().get_paginated_response(data)
+
 
     def get_queryset(self):
         username = self.kwargs.get('username')

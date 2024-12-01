@@ -25,7 +25,6 @@ CACHES = {
         }
     }
 }
-DJANGO_REDIS_IGNORE_EXCEPTIONS = True
 
 
 # Static files (CSS, JavaScript, Images)

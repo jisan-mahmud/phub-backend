@@ -23,21 +23,21 @@ class UserInformationSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'first_name', 'last_name', 'about', 'bio', 'profile_image', 'cover_image','followers', 'following', 'total_post', 'is_following']
     
 
-    # def to_representation(self, instance):
-    #     data = super().to_representation(instance)
-    #     snippet_url = reverse('users-snippet', kwargs= {'username': instance.username})
-    #     follow_url = reverse('follow', kwargs= {'username': instance.username})
-    #     unfollow_url = reverse('user-unfollow', kwargs= {'username': instance.username})
-    #     followers_url = reverse('follower-list', kwargs= {'username': instance.username})
-    #     following_url = reverse('following-list', kwargs= {'username': instance.username})
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        snippet_url = reverse('users-snippet', kwargs= {'username': instance.username})
+        follow_url = reverse('follow', kwargs= {'username': instance.username})
+        unfollow_url = reverse('user-unfollow', kwargs= {'username': instance.username})
+        followers_url = reverse('follower-list', kwargs= {'username': instance.username})
+        following_url = reverse('following-list', kwargs= {'username': instance.username})
     
-    #     data['link'] = {
-    #         'snippet': self.context['request'].build_absolute_uri(snippet_url),
-    #         'follow': self.context['request'].build_absolute_uri(follow_url),
-    #         'unfollow': self.context['request'].build_absolute_uri(unfollow_url),
-    #         'follower': self.context['request'].build_absolute_uri(followers_url),
-    #         'following': self.context['request'].build_absolute_uri(following_url),
-    #     }
+        data['link'] = {
+            'snippet': self.context['request'].build_absolute_uri(snippet_url),
+            'follow': self.context['request'].build_absolute_uri(follow_url),
+            'unfollow': self.context['request'].build_absolute_uri(unfollow_url),
+            'follower': self.context['request'].build_absolute_uri(followers_url),
+            'following': self.context['request'].build_absolute_uri(following_url),
+        }
 
-    #     return data
+        return data
         

@@ -31,9 +31,7 @@ class CommentViewset(ModelViewSet):
         is_root_only = self.request.query_params.get('root-comment') == 'true'
         if snippet_id and is_root_only:
             return Comment.objects.filter(snippet_id=snippet_id, parent_comment__isnull=True).select_related('user')
-        elif snippet_id:
-            return Comment.objects.filter(snippet_id=snippet_id).select_related('user')
-        return Comment.objects.all().select_related('user')
+        return Comment.objects.filter(snippet_id= snippet_id).select_related('user')
     
     def get_serializer_context(self):
         # Add the request and snippet_id to the context
