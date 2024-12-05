@@ -58,6 +58,7 @@ class Snippet(models.Model):
     token = models.UUIDField(default=uuid.uuid4, editable=False, unique= True, blank= True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
+    
     upvotes = models.PositiveIntegerField(default=0)
     downvotes = models.PositiveIntegerField(default=0)
     comment_count = models.PositiveIntegerField(default= 0)
