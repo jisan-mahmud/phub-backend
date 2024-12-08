@@ -9,15 +9,13 @@ User = get_user_model()
 class SnippetSerializer(serializers.ModelSerializer):
     # Nesting user serializer with snippet serializer
     user = UserSerializer(read_only= True)
-    is_voted = serializers.BooleanField(read_only= True, default= False)
-    vote_type = serializers.CharField(read_only= True)
+
     class Meta:
         model = Snippet
-        fields = ['id', 'user', 'title', 'description', 'snippet', 'language', 'created_at', 'last_update', 'upvotes', 'downvotes', 'total_comment', 'visibility', 'token', 'is_voted', 'vote_type']
+        fields = ['id', 'user', 'title', 'description', 'snippet', 'language', 'created_at', 'last_update', 'upvotes', 'downvotes', 'total_comment', 'visibility', 'token']
 
     # overrite default serializer representation
     def to_representation(self, instance):
-        print(self.context['request'].build_absolute_uri())
         data = super().to_representation(instance)
 
         # add important link

@@ -24,8 +24,6 @@ class SnippetViewSet(ModelViewSet):
     ordering_fields = ['title', 'language', 'created_at']
     ordering = ['-created_at']
 
-    # def list(self, request, *args, **kwargs):
-    #     return super().list(request, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):
         page = request.GET.get('snippet_page')
@@ -35,18 +33,19 @@ class SnippetViewSet(ModelViewSet):
             print('Serve from caches')
             return Response(cache_data, status= status.HTTP_200_OK)
         response = super().list(request, *args, **kwargs)
-        cache.set(cache_key, response.data, timeout= 1000)
+        cache.set(cache_key, response.data, timeout= 200)
         print('data server from db')
         return response
     
     def retrieve(self, request, *args, **kwargs):
-        cache_key = f'snippet_id:{kwargs.get('pk')}'
-        cache_data = cache.get(cache_key)
-        if cache_data:
+        snippet_cache_key = f'snippet_static:{kwargs.get('pk')}'
+        snippet_cache_data = cache.get(snippet_cache_key)
+
+        if snippet_cache_data:
             print('Serve from caches')
-            return Response(cache_data, status= status.HTTP_200_OK)
+            return Response(snippet_cache_data, status= status.HTTP_200_OK)
         response = super().retrieve(request, *args, **kwargs)
-        cache.set(cache_key, response.data, timeout= 1000)
+        cache.set(snippet_cache_key, response.data, timeout= 10)
         print('data server from db')
         return response
 

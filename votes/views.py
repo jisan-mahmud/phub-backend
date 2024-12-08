@@ -4,10 +4,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwner
-from django.db.models import signals
 from .serializers import VoteSerializers
 from .models import Vote
-from django.db import connection
+from django.core.cache import cache
 
 class VoteViewset(CreateAPIView, RetrieveAPIView, DestroyAPIView):
     queryset = Vote.objects.all()
@@ -58,9 +57,6 @@ class VoteViewset(CreateAPIView, RetrieveAPIView, DestroyAPIView):
 
         # Handle vote for snippet
         if snippet_id and not comment_id:
-            # Log the number of queries
-            query_count = len(connection.queries)
-            print(f"Number of queries: {query_count}", connection.queries)
             return handle_vote('snippet_vote', snippet_id)
 
         # Handle vote for comment
@@ -80,19 +76,43 @@ class VoteViewset(CreateAPIView, RetrieveAPIView, DestroyAPIView):
         if this vote for exicute first one 'if block'
         if this vote for comment exicute 'elif block'
         '''
+
+        # Default response message
+        message = {"is_voted": False, "vote_type": None}
+
         if snippet_id and not comment_id:
-            try:
-                vote = Vote.objects.get(user= request.user, snippet_id= snippet_id)
-            except Vote.DoesNotExist:
-                return Response(status= status.HTTP_204_NO_CONTENT)
+            cache_key = f'snippet_vote:{snippet_id}'
+            cache_data = cache.get(cache_key)
+            if cache_data:
+                return Response(cache_data, status= status.HTTP_200_OK)
+            else:
+                try:
+                    vote = Vote.objects.get(user= request.user, snippet_id= snippet_id)
+                    message = {
+                        'is_voted': True,
+                        'vote_type': vote.vote_type,
+                        'snippet_id': vote.snippet.id  # Extract only the snippet ID
+                    }
+                    cache.set(cache_key, message, timeout= 500)
+                except Vote.DoesNotExist:
+                    return Response(status= status.HTTP_204_NO_CONTENT)
         elif comment_id:
-            try:
-                vote = Vote.objects.get(user= request.user, comment_id= comment_id)
-            except Vote.DoesNotExist:
-                return Response(status= status.HTTP_204_NO_CONTENT)
-            
-        seriaizer = self.get_serializer(vote)
-        return Response(seriaizer.data, status= status.HTTP_200_OK)
+            cache_key = f'comment_vote:{comment_id}'
+            cache_data = cache.get(cache_key)
+            if cache_data:
+                return Response(cache_data, status= status.HTTP_200_OK)
+            else:
+                try:
+                    vote = Vote.objects.get(user= request.user, comment_id= comment_id)
+                    message = {
+                        'is_voted': True,
+                        'vote_type': vote.vote_type,
+                        'snippet_id': vote.comment.id  # Extract only the snippet ID
+                    }
+                    cache.set(cache_key, message, timeout= 500)
+                except Vote.DoesNotExist:
+                    return Response(status= status.HTTP_204_NO_CONTENT)
+        return Response(message, status= status.HTTP_200_OK)
     
 
     def destroy(self, request, *args, **kwargs):
