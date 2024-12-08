@@ -94,14 +94,13 @@ def handle_vote_delete(sender, instance, **kwargs):
 
 @receiver(post_save, sender= Vote)
 def invalid_vote_cache(sender, instance, created, *args, **kwargs):
-    if not created:
-        if instance.snippet and not instance.comment:
-            cache_key = f'snippet_vote:{instance.snippet.id}'
-            cache.delete(cache_key)
-        elif instance.comment:
-            cache_key = f'comment_vote:{instance.comment.id}'
-            print(cache_key)
-            cache.delete(cache_key)
+    if instance.snippet and not instance.comment:
+        cache_key = f'snippet_vote:{instance.snippet.id}'
+        cache.delete(cache_key)
+    elif instance.comment:
+        cache_key = f'comment_vote:{instance.comment.id}'
+        print(cache_key)
+        cache.delete(cache_key)
 
 @receiver(post_delete, sender= Vote)
 def invalid_vote_cache(sender, instance, *args, **kwargs):

@@ -17,13 +17,14 @@ class SnippetSerializer(serializers.ModelSerializer):
     # overrite default serializer representation
     def to_representation(self, instance):
         data = super().to_representation(instance)
-
+        
         # add important link
         data['link'] = {
             'self': self.context['request'].build_absolute_uri(f'{instance.id}/'),
             'update': self.context['request'].build_absolute_uri(f'{instance.id}/'),
             'delete': self.context['request'].build_absolute_uri(f'{instance.id}/'),
-            'comments': self.context['request'].build_absolute_uri(reverse('comments-list', args=[instance.id])) + '?root-comment=true'
+            'comments': self.context['request'].build_absolute_uri(reverse('comments-list', args=[instance.id])) + '?root-comment=true',
+            'vote_info': self.context['request'].build_absolute_uri(f'{instance.id}/vote/'),
         }
 
         #If request not equal to snippet onwer remove secret token

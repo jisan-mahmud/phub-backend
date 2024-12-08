@@ -93,9 +93,13 @@ class VoteViewset(CreateAPIView, RetrieveAPIView, DestroyAPIView):
                         'vote_type': vote.vote_type,
                         'snippet_id': vote.snippet.id  # Extract only the snippet ID
                     }
-                    cache.set(cache_key, message, timeout= 500)
+                    return Response(message, status= status.HTTP_200_OK)
                 except Vote.DoesNotExist:
-                    return Response(status= status.HTTP_204_NO_CONTENT)
+                    return Response(message, status= status.HTTP_200_OK)
+                finally:
+                    cache.set(cache_key, message, timeout= 500)
+
+
         elif comment_id:
             cache_key = f'comment_vote:{comment_id}'
             cache_data = cache.get(cache_key)
@@ -112,7 +116,6 @@ class VoteViewset(CreateAPIView, RetrieveAPIView, DestroyAPIView):
                     cache.set(cache_key, message, timeout= 500)
                 except Vote.DoesNotExist:
                     return Response(status= status.HTTP_204_NO_CONTENT)
-        return Response(message, status= status.HTTP_200_OK)
     
 
     def destroy(self, request, *args, **kwargs):
