@@ -4,6 +4,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework import status
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+from .paginations import CommentPagination
 from django.db.models import Q, Count
 from .serializers import CommentSerializer
 from .permission import CommentPermission
@@ -12,6 +15,7 @@ from .models import Comment
 class CommentViewset(ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [CommentPermission]
+    pagination_class = CommentPagination
 
     def perform_create(self, serializer):
         snippet_id = self.kwargs.get('snippet_id') # store snippet id
@@ -40,6 +44,10 @@ class CommentViewset(ModelViewSet):
         context['snippet_id'] = self.kwargs.get('snippet_id')
         return context
     
+    @method_decorator(cache_page(30))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 class CommentRepliesViewset(ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [CommentPermission]

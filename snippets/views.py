@@ -1,5 +1,6 @@
 from django.core.cache import cache
-# from rest_framework.decorators
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 from django.db.models import Q
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
@@ -25,17 +26,9 @@ class SnippetViewSet(ModelViewSet):
     ordering = ['-created_at']
 
 
+    @method_decorator(cache_page(5))
     def list(self, request, *args, **kwargs):
-        page = request.GET.get('snippet_page')
-        cache_key = f'snippets_list_page:{page}'
-        cache_data = cache.get(cache_key)
-        if cache_data:
-            print('Serve from caches')
-            return Response(cache_data, status= status.HTTP_200_OK)
-        response = super().list(request, *args, **kwargs)
-        cache.set(cache_key, response.data, timeout= 200)
-        print('data server from db')
-        return response
+        return super().list(request, *args, **kwargs)
     
     def retrieve(self, request, *args, **kwargs):
         snippet_id = kwargs.get('pk')
@@ -50,7 +43,7 @@ class SnippetViewSet(ModelViewSet):
             # Retrieve snippet data using the parent retrieve method
             response = super().retrieve(request, *args, **kwargs)
             snippet_cache_data = response.data
-            cache.set(snippet_cache_key, snippet_cache_data, timeout=1000)
+            cache.set(snippet_cache_key, snippet_cache_data, timeout= 60 * 5)
 
         # Fetch vote data from cache
         vote_cache_data = cache.get(vote_cache_key)
@@ -69,7 +62,7 @@ class SnippetViewSet(ModelViewSet):
                     'vote_type': None,
                     'snippet_id': None,
                 }
-            cache.set(vote_cache_key, vote_cache_data, timeout=1000)
+            cache.set(vote_cache_key, vote_cache_data, timeout= 60 * 5)
 
         # Combine snippet and vote data
         response_data = {**snippet_cache_data, **vote_cache_data}
