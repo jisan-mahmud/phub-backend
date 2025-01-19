@@ -24,7 +24,7 @@ class SnippetSerializer(serializers.ModelSerializer):
             'update': self.context['request'].build_absolute_uri(f'{instance.id}/'),
             'delete': self.context['request'].build_absolute_uri(f'{instance.id}/'),
             'comments': self.context['request'].build_absolute_uri(reverse('comments-list', args=[instance.id])) + '?root-comment=true',
-            'vote_info': self.context['request'].build_absolute_uri(f'{instance.id}/vote/'),
+            'vote': self.context['request'].build_absolute_uri(reverse('vote', args= [instance.id])),
         }
 
         #If request not equal to snippet onwer remove secret token
