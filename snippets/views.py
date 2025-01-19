@@ -48,23 +48,23 @@ class SnippetViewSet(ModelViewSet):
         # Fetch vote data from cache
         vote_cache_data = cache.get(vote_cache_key)
         if vote_cache_data is None:
+
             # Retrieve vote information from the database
-            try:
-                vote = Vote.objects.get(user=request.user, snippet_id=snippet_id)
-                vote_cache_data = {
-                    'is_voted': True,
-                    'vote_type': vote.vote_type,
-                    'snippet_id': snippet_id,
-                }
-            except Vote.DoesNotExist:
-                vote_cache_data = {
-                    'is_voted': False,
-                    'vote_type': None,
-                    'snippet_id': None,
-                }
+            vote_cache_data = {
+                'is_voted': False,
+                'vote_type': None,
+            }
+
+            if request.user.is_authenticated:
+                vote = Vote.objects.filter(user=request.user, snippet_id=snippet_id).first()
+                if vote:
+                    vote_cache_data.update({
+                        'is_voted': True,
+                        'vote_type': vote.vote_type,
+                    })
             cache.set(vote_cache_key, vote_cache_data, timeout= 60 * 5)
 
-        # Combine snippet and vote data
+        # # Combine snippet and vote data
         response_data = {**snippet_cache_data, **vote_cache_data}
 
         return Response(response_data, status=status.HTTP_200_OK)
