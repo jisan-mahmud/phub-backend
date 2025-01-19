@@ -19,6 +19,6 @@ class CommentSerializer(serializers.ModelSerializer):
             'update': context['request'].build_absolute_uri(reverse('comments-detail', args=[snippet_id, instance.id])),  # Link to update the comment
             'delete': context['request'].build_absolute_uri(reverse('comments-detail', args=[snippet_id, instance.id])),  # Link to delete the comment
             'reply': context['request'].build_absolute_uri(reverse('comment-replies', args=[snippet_id, instance.id])),# Link to reply to the comment
-            'vote': context['request'].build_absolute_uri(reverse('vote', args= [instance.id]))
+            'vote': context['request'].build_absolute_uri(reverse('vote', kwargs= {'comment_id': instance.id}))
         }
         return data

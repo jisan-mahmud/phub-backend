@@ -62,7 +62,6 @@ class VoteViewset(CreateAPIView, RetrieveAPIView, DestroyAPIView):
         # Handle vote for comment
         if comment_id:
             return handle_vote('comment_vote', comment_id)
-        
 
         return Response({"error": "Invalid vote data."}, status=status.HTTP_400_BAD_REQUEST)
             
