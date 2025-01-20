@@ -7,10 +7,11 @@ from rest_framework import status
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from .paginations import CommentPagination
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Exists, OuterRef, Value, BooleanField
 from .serializers import CommentSerializer
 from .permission import CommentPermission
 from .models import Comment
+from votes.models import Vote
 
 class CommentViewset(ModelViewSet):
     serializer_class = CommentSerializer
@@ -31,11 +32,23 @@ class CommentViewset(ModelViewSet):
             raise ValidationError(error_message)
 
     def get_queryset(self):
+        user = self.request.user
         snippet_id = self.kwargs.get('snippet_id')
         is_root_only = self.request.query_params.get('root-comment') == 'true'
+
+
         if snippet_id and is_root_only:
-            return Comment.objects.filter(snippet_id=snippet_id, parent_comment__isnull=True).select_related('user')
-        return Comment.objects.filter(snippet_id= snippet_id).select_related('user')
+            return Comment.objects.filter(snippet_id=snippet_id, parent_comment__isnull=True).select_related('user').annotate(
+            is_voted =Exists(
+                    Vote.objects.filter(comment=OuterRef('pk'), user= user)
+                ) if user.is_authenticated else Value(False, output_field=BooleanField())
+            )
+
+        return Comment.objects.filter(snippet_id= snippet_id).select_related('user').annotate(
+            is_voted =Exists(
+                    Vote.objects.filter(comment=OuterRef('pk'), user= user)
+                ) if user.is_authenticated else Value(False, output_field=BooleanField())
+            )
     
     def get_serializer_context(self):
         # Add the request and snippet_id to the context
@@ -43,10 +56,6 @@ class CommentViewset(ModelViewSet):
         context['request'] = self.request
         context['snippet_id'] = self.kwargs.get('snippet_id')
         return context
-    
-    @method_decorator(cache_page(30))
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
 
 class CommentRepliesViewset(ModelViewSet):
     serializer_class = CommentSerializer

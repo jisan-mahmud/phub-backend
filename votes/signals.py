@@ -99,7 +99,6 @@ def invalid_vote_cache(sender, instance, created, *args, **kwargs):
         cache.delete(cache_key)
     elif instance.comment:
         cache_key = f'comment_vote:{instance.comment.id}'
-        print(cache_key)
         cache.delete(cache_key)
 
 @receiver(post_delete, sender= Vote)
